@@ -80,6 +80,8 @@ public class EarthquakeActivity extends AppCompatActivity  implements LoaderMana
         if (list!=null&&!list.isEmpty()){
             adapter.addAll(list);
         }
+        View loadIndicator = findViewById(R.id.prog_view);
+        loadIndicator.setVisibility(View.GONE);
     }
     @Override
     public void onLoaderReset(Loader<List<Data>>loader){
