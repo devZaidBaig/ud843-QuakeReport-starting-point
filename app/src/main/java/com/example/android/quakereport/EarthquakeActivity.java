@@ -16,8 +16,11 @@
 package com.example.android.quakereport;
 
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -40,19 +43,11 @@ public class EarthquakeActivity extends AppCompatActivity  implements LoaderMana
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
-
-        LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(EARTHQUAKE_LOADER_ID,null,this);
-
-        // Find a reference to the {@link ListView} in the layout
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
 
-        emptyView = (TextView)findViewById(R.id.empty_view);
+        emptyView = (TextView) findViewById(R.id.empty_view);
         earthquakeListView.setEmptyView(emptyView);
-        // Create a new {@link ArrayAdapter} of earthquakes
-        adapter = new WordAdapter(this,new ArrayList<Data>());
-        // Set the adapter on the {@link ListView}
-        // so the list can be populated in the user interface
+        adapter = new WordAdapter(this, new ArrayList<Data>());
         earthquakeListView.setAdapter(adapter);
 
         earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -64,6 +59,21 @@ public class EarthquakeActivity extends AppCompatActivity  implements LoaderMana
                 startActivity(intent);
             }
         });
+
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            LoaderManager loaderManager = getLoaderManager();
+            loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+        } else {
+            View loadingIndicator = findViewById(R.id.prog_view);
+            loadingIndicator.setVisibility(View.GONE);
+            emptyView.setText("No Internet Connection.");
+        }
+
+
     }
 
     /*
